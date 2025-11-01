@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: kaunta-postgres
+    environment:
+      POSTGRES_DB: kaunta
+      POSTGRES_USER: kaunta
+      POSTGRES_PASSWORD: kaunta
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kaunta"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kaunta:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kaunta-app
+    environment:
+      DATABASE_URL: postgresql://kaunta:kaunta@postgres:5432/kaunta?sslmode=disable
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/kaunta", "-v"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  postgres_data:

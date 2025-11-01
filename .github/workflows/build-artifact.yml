@@ -1,0 +1,49 @@
+name: Build Binary Artifact
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25'
+          cache: true
+
+      - name: Get version
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Build binary
+        run: |
+          mkdir -p dist
+          for GOOS in linux darwin windows; do
+            for GOARCH in amd64 arm64; do
+              EXT=""
+              [ "$GOOS" = "windows" ] && EXT=".exe"
+
+              CGO_ENABLED=0 GOOS=$GOOS GOARCH=$GOARCH go build \
+                -ldflags="-w -s" \
+                -o dist/kaunta-${{ steps.version.outputs.VERSION }}-${GOOS}-${GOARCH}${EXT} \
+                ./cmd/kaunta
+            done
+          done
+
+      - name: Upload to release
+        run: |
+          for file in dist/*; do
+            gh release upload ${{ steps.version.outputs.VERSION }} "$file"
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

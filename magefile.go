@@ -1,0 +1,75 @@
+//go:build mage
+
+package main
+
+import (
+	"fmt"
+	"os"
+	"runtime"
+
+	"github.com/magefile/mage/sh"
+)
+
+// Build builds Kaunta for Linux with Green Tea GC
+func Build() error {
+	fmt.Println("Building Kaunta for Linux with Go 1.25 + Green Tea GC...")
+	env := map[string]string{
+		"GOOS":         "linux",
+		"GOARCH":       "amd64",
+		"GOEXPERIMENT": "greenteagc",
+	}
+	return sh.RunWith(env, "go", "build", "-o", "kaunta-linux-amd64", "./cmd/kaunta")
+}
+
+// BuildLocal builds Kaunta for current platform
+func BuildLocal() error {
+	fmt.Printf("Building Kaunta for %s/%s...\n", runtime.GOOS, runtime.GOARCH)
+	return sh.Run("go", "build", "-o", "kaunta", "./cmd/kaunta")
+}
+
+// Test runs tests
+func Test() error {
+	fmt.Println("Running tests...")
+	return sh.Run("go", "test", "-v", "./...")
+}
+
+// Clean removes build artifacts
+func Clean() error {
+	fmt.Println("Cleaning build artifacts...")
+	os.Remove("kaunta")
+	os.Remove("kaunta-linux-amd64")
+	return nil
+}
+
+// Deploy builds and deploys to production server
+func Deploy() error {
+	if err := Build(); err != nil {
+		return err
+	}
+
+	fmt.Println("Deploying to production...")
+	server := "root@78.47.110.90"
+
+	// Upload binary
+	if err := sh.Run("scp", "kaunta-linux-amd64", server+":/usr/local/bin/kaunta-new"); err != nil {
+		return err
+	}
+
+	// Restart service
+	cmd := "systemctl stop kaunta && mv /usr/local/bin/kaunta /usr/local/bin/kaunta-old && mv /usr/local/bin/kaunta-new /usr/local/bin/kaunta && chmod +x /usr/local/bin/kaunta && systemctl start kaunta"
+	if err := sh.Run("ssh", server, cmd); err != nil {
+		return err
+	}
+
+	fmt.Println("Deployment complete!")
+	return sh.Run("ssh", server, "systemctl status kaunta")
+}
+
+// Update upgrades all Go dependencies
+func Update() error {
+	fmt.Println("Updating dependencies...")
+	if err := sh.Run("go", "get", "-u", "./..."); err != nil {
+		return err
+	}
+	return sh.Run("go", "mod", "tidy")
+}
