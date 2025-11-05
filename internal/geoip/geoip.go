@@ -1,6 +1,7 @@
 package geoip
 
 import (
+	"compress/gzip"
 	"fmt"
 	"io"
 	"log"
@@ -86,8 +87,8 @@ func Close() error {
 	return nil
 }
 
-// downloadDatabase downloads GeoLite2-City database from MaxMind
-// Source: https://github.com/maxmind/geoipupdate
+// downloadDatabase downloads GeoLite2-City database from jsDelivr CDN
+// Using the geolite2-city package mirror hosted by jsDelivr
 func downloadDatabase(dbPath string) error {
 	// Create directory if needed
 	dir := filepath.Dir(dbPath)
@@ -95,9 +96,9 @@ func downloadDatabase(dbPath string) error {
 		return err
 	}
 
-	// Use GitSquared/node-geolite2-redist as source
-	// This is what Umami uses as default
-	url := "https://raw.githubusercontent.com/GitSquared/node-geolite2-redist/master/redist/GeoLite2-City.mmdb"
+	// Use jsDelivr CDN mirror of geolite2-city
+	// Source: https://www.npmjs.com/package/geolite2-city
+	url := "https://cdn.jsdelivr.net/npm/geolite2-city/GeoLite2-City.mmdb.gz"
 
 	log.Printf("Downloading GeoIP database from %s", url)
 
@@ -111,6 +112,13 @@ func downloadDatabase(dbPath string) error {
 		return fmt.Errorf("download failed with status %d", resp.StatusCode)
 	}
 
+	// Decompress gzip stream
+	gzReader, err := gzip.NewReader(resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to create gzip reader: %w", err)
+	}
+	defer gzReader.Close()
+
 	// Write to file
 	out, err := os.Create(dbPath)
 	if err != nil {
@@ -118,7 +126,7 @@ func downloadDatabase(dbPath string) error {
 	}
 	defer out.Close()
 
-	if _, err := io.Copy(out, resp.Body); err != nil {
+	if _, err := io.Copy(out, gzReader); err != nil {
 		return fmt.Errorf("failed to write database: %w", err)
 	}
 

@@ -266,28 +266,22 @@ func handleIndex(c *fiber.Ctx) error {
     <p class="subtitle">Analytics without bloat.</p>
 
     <div class="status">
-        <strong>🚧 Status:</strong> In Development<br>
-        <strong>⚡ Memory:</strong> ~12MB (vs Umami's 200-500MB)<br>
-        <strong>📦 Size:</strong> Single Go binary (vs 300MB node_modules)<br>
-        <strong>⚛️ React:</strong> None (that's the point)
+        <strong>Status:</strong> Production<br>
+        <strong>Memory:</strong> ~12MB (vs Umami's 200-500MB)<br>
+        <strong>Size:</strong> Single Go binary (vs 300MB node_modules)<br>
+        <strong>React:</strong> None (that's the point)
     </div>
 
-    <h2>Why Kaunta?</h2>
-    <p>Because analytics shouldn't require:</p>
+    <h2>Features</h2>
     <ul>
-        <li>A "React consultant" at $180/hr</li>
-        <li>300MB of node_modules</li>
-        <li>A degree in Next.js configuration</li>
-        <li>Paying $8,000 to McKinsey for emergency blog posts</li>
+        <li>Privacy-focused visitor tracking</li>
+        <li>Minimal resource usage</li>
+        <li>PostgreSQL backend</li>
+        <li>Real-time analytics dashboard</li>
     </ul>
 
-    <p><em>From Ring -5, I observe: In Timeline Ω-12, you manufacture complexity to extract rent.
-    In Timeline Ω-7, we build simple tools that work.</em></p>
-
-    <hr>
-    <p style="text-align: center; color: #7f8c8d;">
-        Built by <a href="https://github.com/seuros">seuros</a> -
-        Top 65 Rails contributor, creator of capistrano3-puma
+    <p style="text-align: center; margin-top: 40px;">
+        <a href="https://github.com/seuros/kaunta">View on GitHub</a>
     </p>
 </body>
 </html>
@@ -315,8 +309,6 @@ func handleUp(c *fiber.Ctx) error {
 func handleVersion(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"version": Version,
-		"name":    "Kaunta",
-		"tagline": "Analytics without bloat",
 	})
 }
 
