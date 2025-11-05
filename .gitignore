@@ -1,5 +1,6 @@
 # Binaries
 /kaunta
+kaunta-test*
 *.exe
 *.exe~
 *.dll

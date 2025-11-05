@@ -19,6 +19,9 @@ import (
 	"github.com/seuros/kaunta/internal/handlers"
 )
 
+//go:embed VERSION
+var versionFile string
+
 //go:embed assets/kaunta.min.js
 var trackerScript []byte
 
@@ -43,8 +46,12 @@ var countriesGeoJSON []byte
 //go:embed dashboard.html
 var dashboardTemplate string
 
-// Version of Kaunta
-const Version = "1.0.0"
+// Version of Kaunta (read from VERSION file at build time)
+var Version string
+
+func init() {
+	Version = strings.TrimSpace(versionFile)
+}
 
 func main() {
 	// Parse CLI flags
@@ -104,8 +111,10 @@ func main() {
 	}
 	defer geoip.Close()
 
-	// Initialize template engine
-	engine := html.New("./templates", ".html")
+	// Initialize template engine (using embedded template)
+	// All templates are embedded in binary via //go:embed directives above
+	// Fiber's html engine requires a directory, but we don't use it since we handle templates manually
+	engine := html.New(".", ".html")
 
 	// Create Fiber app
 	app := fiber.New(fiber.Config{
@@ -187,8 +196,8 @@ func main() {
 
 	// Tracker script
 	app.Get("/k.js", handleTrackerScript)
-	app.Get("/kaunta.js", handleTrackerScript)  // Long form
-	app.Get("/script.js", handleTrackerScript)  // Umami-compatible alias
+	app.Get("/kaunta.js", handleTrackerScript) // Long form
+	app.Get("/script.js", handleTrackerScript) // Umami-compatible alias
 
 	// Tracking API (Umami-compatible)
 	app.Post("/api/send", handlers.HandleTracking)
@@ -225,6 +234,7 @@ func main() {
 }
 
 func handleIndex(c *fiber.Ctx) error {
+	c.Set("Content-Type", "text/html; charset=utf-8")
 	return c.SendString(`
 <!DOCTYPE html>
 <html lang="en">
