@@ -7,37 +7,33 @@ import (
 )
 
 func TestLookupIP(t *testing.T) {
-	// Note: Without database loaded, LookupIP returns "Unknown"
+	// Note: Without database loaded, LookupIP returns empty string for country (not "Unknown")
+	// This is intentional to prevent CHAR(2) column constraint violations
 	// This tests the behavior when database is not initialized
 	tests := []struct {
 		name      string
 		ip        string
 		wantError bool
-		minResult string // Should contain at least this
 	}{
 		{
 			name:      "Valid IP without DB",
 			ip:        "8.8.8.8",
 			wantError: false,
-			minResult: "Unknown",
 		},
 		{
 			name:      "Invalid IP format",
 			ip:        "999.999.999.999",
 			wantError: false,
-			minResult: "Unknown",
 		},
 		{
 			name:      "Empty string",
 			ip:        "",
 			wantError: false,
-			minResult: "Unknown",
 		},
 		{
 			name:      "Localhost",
 			ip:        "127.0.0.1",
 			wantError: false,
-			minResult: "Unknown", // Localhost not in GeoIP DB
 		},
 	}
 
@@ -45,9 +41,10 @@ func TestLookupIP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			country, city, region := LookupIP(tt.ip)
 
-			// When DB is not loaded, should return Unknown/empty
+			// When DB is not loaded, should return empty string for country
+			// to comply with CHAR(2) database constraint
 			if reader == nil {
-				assert.Equal(t, "Unknown", country)
+				assert.Equal(t, "", country)
 				assert.Equal(t, "", city)
 				assert.Equal(t, "", region)
 			}
@@ -73,10 +70,10 @@ func TestLookupIPWithDatabase(t *testing.T) {
 		country string
 		city    string
 	}{
-		"8.8.8.8":      {"US", "Mountain View"},      // Google DNS
-		"1.1.1.1":      {"US", "Los Angeles"},        // Cloudflare DNS
-		"9.9.9.9":      {"US", ""},                   // Quad9 DNS
-		"208.67.222.2": {"US", ""},                   // OpenDNS
+		"8.8.8.8":      {"US", "Mountain View"}, // Google DNS
+		"1.1.1.1":      {"US", "Los Angeles"},   // Cloudflare DNS
+		"9.9.9.9":      {"US", ""},              // Quad9 DNS
+		"208.67.222.2": {"US", ""},              // OpenDNS
 	}
 
 	// Only run if database is loaded

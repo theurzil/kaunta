@@ -78,14 +78,14 @@ func HandleTracking(c *fiber.Ctx) error {
 		})
 	}
 
-	// Verify website exists
-	var exists bool
+	// Verify website exists and fetch proxy_mode
+	var proxyMode string
 	err = database.DB.QueryRow(
-		"SELECT EXISTS(SELECT 1 FROM website WHERE website_id = $1)",
+		"SELECT COALESCE(proxy_mode, 'none') FROM website WHERE website_id = $1",
 		websiteID,
-	).Scan(&exists)
+	).Scan(&proxyMode)
 
-	if err != nil || !exists {
+	if err != nil {
 		return c.Status(404).JSON(fiber.Map{
 			"error": "Website not found",
 		})
@@ -125,7 +125,7 @@ func HandleTracking(c *fiber.Ctx) error {
 	}
 
 	// Get client info
-	ip := c.IP()
+	ip := getClientIP(c, proxyMode)
 	userAgent := c.Get("User-Agent")
 
 	// Override with payload if provided
@@ -472,4 +472,25 @@ func parseUserAgent(ua string) (browser, os, device *string) {
 func geoIPLookup(ip string) (country, city, region string) {
 	country, city, region = geoip.LookupIP(ip)
 	return
+}
+
+// getClientIP extracts client IP based on proxy_mode configuration
+// Supports:
+// - "none": direct connection IP (default)
+// - "xforwarded": X-Forwarded-For header (first IP from comma-separated list)
+// - "cloudflare": CF-Connecting-IP header (Cloudflare)
+func getClientIP(c *fiber.Ctx, proxyMode string) string {
+	switch proxyMode {
+	case "cloudflare":
+		if cfIP := c.Get("CF-Connecting-IP"); cfIP != "" {
+			return cfIP
+		}
+	case "xforwarded":
+		if xff := c.Get("X-Forwarded-For"); xff != "" {
+			// Take first IP from comma-separated list
+			return strings.Split(xff, ",")[0]
+		}
+	}
+	// Default: use direct connection IP
+	return c.IP()
 }

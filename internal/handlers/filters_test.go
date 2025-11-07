@@ -130,18 +130,18 @@ func TestBuildFilterClause(t *testing.T) {
 func TestBuildFilterClause_ArgumentNumbering(t *testing.T) {
 	// Test that argument numbering continues correctly from base args
 	tests := []struct {
-		name         string
-		baseArgsLen  int
+		name          string
+		baseArgsLen   int
 		expectedStart int
 	}{
 		{
-			name:         "Starting from $1",
-			baseArgsLen:  1,
+			name:          "Starting from $1",
+			baseArgsLen:   1,
 			expectedStart: 2,
 		},
 		{
-			name:         "Starting from $3",
-			baseArgsLen:  3,
+			name:          "Starting from $3",
+			baseArgsLen:   3,
 			expectedStart: 4,
 		},
 	}
