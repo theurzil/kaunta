@@ -736,13 +736,7 @@
           <div class="code-block">
             <div class="code-header">Or use environment variables</div>
             <div class="code-content">
-              <code
-                ><span class="code-keyword">export</span>
-                <span class="code-function">DATABASE_URL</span>=<span
-                  class="code-string"
-                  >"postgresql://user:password@localhost:5432/kaunta"</span
-                ></code
-              >
+              <code><span class="code-keyword">export</span> <span class="code-function">DATABASE_URL</span>=<span class="code-string">"postgresql://user:password@localhost:5432/kaunta"</span></code>
             </div>
           </div>
 
@@ -759,14 +753,7 @@
           <div class="code-block">
             <div class="code-header">docker</div>
             <div class="code-content">
-              <code
-                ><span class="code-function">docker</span> run -e
-                <span class="code-function">DATABASE_URL</span>=<span
-                  class="code-string"
-                  >"postgresql://..."</span
-                >
-                -p 3000:3000 kaunta</code
-              >
+              <code><span class="code-function">docker</span> run -e <span class="code-function">DATABASE_URL</span>=<span class="code-string">"postgresql://..."</span> -p 3000:3000 kaunta</code>
             </div>
           </div>
 
@@ -838,18 +825,7 @@
         <div class="code-block">
           <div class="code-header">html</div>
           <div class="code-content">
-            <code
-              ><span class="code-keyword">&lt;script</span>
-              <span class="code-function">src</span>=<span class="code-string"
-                >"https://your-kaunta-server.com/k.js"</span
-              >
-              <span class="code-function">data-website-id</span>=<span
-                class="code-string"
-                >"your-website-uuid"</span
-              >
-              <span class="code-function">async defer</span
-              ><span class="code-keyword">&gt;&lt;/script&gt;</span></code
-            >
+            <code><span class="code-keyword">&lt;script</span> <span class="code-function">src</span>=<span class="code-string">"https://your-kaunta-server.com/k.js"</span> <span class="code-function">data-website-id</span>=<span class="code-string">"your-website-uuid"</span> <span class="code-function">async defer</span><span class="code-keyword">&gt;&lt;/script&gt;</span></code>
           </div>
         </div>
 
