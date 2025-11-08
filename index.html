@@ -1,0 +1,987 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kaunta - Analytics without bloat</title>
+    <meta name="description" content="Kaunta - Privacy-focused web analytics without bloat. Lightweight, fast, Umami-compatible analytics engine." />
+    <link rel="canonical" href="https://seuros.github.io/kaunta/" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Kaunta - Analytics without bloat" />
+    <meta property="og:description" content="Privacy-focused web analytics. Lightweight, fast, Umami-compatible." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://seuros.github.io/kaunta/" />
+    <meta property="og:site_name" content="Kaunta Analytics" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Kaunta · Lightweight Umami-compatible analytics" />
+    <meta name="twitter:description" content="Self-hosted, privacy-first metrics in a single binary." />
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#3b82f6" />
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Kaunta",
+      "applicationCategory": "AnalyticsApplication",
+      "operatingSystem": "Linux, macOS, Docker",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "softwareVersion": "0.6.1",
+      "url": "https://seuros.github.io/kaunta/",
+      "downloadUrl": "https://github.com/seuros/kaunta/releases",
+      "description": "Privacy-focused web analytics without bloat. Lightweight, fast, Umami-compatible analytics engine."
+    }
+    </script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      :root {
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8f9fa;
+        --bg-accent: #f0f4ff;
+        --text-primary: #1a1a1a;
+        --text-secondary: #4b5563;
+        --text-tertiary: #6b7280;
+        --border-color: #e5e7eb;
+        --accent-color: #2563eb;
+        --accent-dark: #1f2937;
+        --code-bg: #282c34;
+        --code-text: #abb2bf;
+        --code-keyword: #c678dd;
+        --code-string: #98c379;
+        --code-comment: #5c6370;
+        --code-function: #61afef;
+      }
+
+      /* Accessibility: Reduced Motion */
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        * {
+          transition-duration: 0.01ms !important;
+          animation-duration: 0.01ms !important;
+        }
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        line-height: 1.6;
+      }
+
+      /* Header & Navigation */
+      header {
+        border-bottom: 1px solid var(--border-color);
+        padding: 1.5rem 2rem;
+        position: sticky;
+        top: 0;
+        background: var(--bg-primary);
+        z-index: 100;
+      }
+
+      nav {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 2rem;
+      }
+
+      .nav-links a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 0.95rem;
+        transition: color 0.2s ease;
+      }
+
+      .nav-links a:hover {
+        color: var(--accent-color);
+      }
+
+      .cta-button {
+        background-color: var(--accent-dark);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background-color 0.2s ease;
+      }
+
+      .cta-button:hover {
+        background-color: var(--accent-color);
+      }
+
+      /* Hero Section */
+      .hero {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 4rem 2rem;
+        text-align: center;
+      }
+
+      .hero h1 {
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        margin-bottom: 1rem;
+        letter-spacing: -1px;
+        line-height: 1.2;
+      }
+
+      .hero-subtitle {
+        font-size: 1.25rem;
+        color: var(--text-secondary);
+        margin-bottom: 2.5rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 4rem;
+      }
+
+      .primary-btn {
+        background-color: var(--accent-color);
+        color: white;
+        border: none;
+        padding: 0.875rem 2rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          background-color 0.2s ease,
+          transform 0.2s ease;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .primary-btn:hover {
+        background-color: #2563eb;
+        transform: translateY(-2px);
+      }
+
+      .secondary-btn {
+        background-color: transparent;
+        color: var(--accent-color);
+        border: 2px solid var(--accent-color);
+        padding: 0.75rem 1.875rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .secondary-btn:hover {
+        background-color: var(--bg-accent);
+      }
+
+      /* Accessibility: Focus Styles */
+      .primary-btn:focus-visible,
+      .secondary-btn:focus-visible,
+      .cta-button:focus-visible {
+        outline: 3px solid var(--accent-color);
+        outline-offset: 3px;
+      }
+
+      /* Status Box */
+      .status-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 2rem 4rem;
+      }
+
+      .status-box {
+        background: linear-gradient(135deg, #f8f9fa 0%, #f0f4ff 100%);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 3rem;
+      }
+
+      .status-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+      }
+
+      .status-item {
+        text-align: left;
+      }
+
+      .status-label {
+        font-size: 0.85rem;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+      }
+
+      .status-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+      }
+
+      .status-detail {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+      }
+
+      /* Section Container */
+      .section {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 5rem 2rem;
+      }
+
+      .section-alt {
+        background-color: var(--bg-secondary);
+      }
+
+      .section-title {
+        font-size: 2rem;
+        margin-bottom: 2.5rem;
+        text-align: center;
+        font-weight: 700;
+      }
+
+      /* Features Grid */
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+      }
+
+      .feature-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+        transition:
+          border-color 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .feature-card:hover {
+        border-color: var(--accent-color);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+      }
+
+      .feature-icon {
+        width: 48px;
+        height: 48px;
+        background-color: var(--bg-accent);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+      }
+
+      .feature-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+      }
+
+      .feature-description {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+      }
+
+      /* Code Block with Syntax Highlighting */
+      .code-block {
+        background-color: var(--code-bg);
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 1.5rem 0;
+        border: 1px solid var(--border-color);
+      }
+
+      .code-header {
+        background-color: #21252b;
+        padding: 0.75rem 1.5rem;
+        border-bottom: 1px solid #181a1f;
+        font-size: 0.85rem;
+        color: var(--code-comment);
+        font-family: 'Courier New', monospace;
+      }
+
+      .code-content {
+        padding: 1.5rem;
+        overflow-x: auto;
+      }
+
+      .code-content code {
+        font-family: 'Courier New', Consolas, Monaco, monospace;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        color: var(--code-text);
+        display: block;
+        white-space: pre;
+      }
+
+      .code-keyword {
+        color: var(--code-keyword);
+      }
+
+      .code-string {
+        color: var(--code-string);
+      }
+
+      .code-comment {
+        color: var(--code-comment);
+        font-style: italic;
+      }
+
+      .code-function {
+        color: var(--code-function);
+      }
+
+      /* List Styles */
+      .feature-list {
+        list-style: none;
+        padding: 0;
+        margin: 2rem 0;
+      }
+
+      .feature-list li {
+        padding: 0.75rem 0;
+        padding-left: 2rem;
+        position: relative;
+        color: var(--text-secondary);
+      }
+
+      .feature-list li:before {
+        content: '✓';
+        position: absolute;
+        left: 0;
+        color: var(--accent-color);
+        font-weight: 700;
+        font-size: 1.2rem;
+      }
+
+      /* Dashboard Preview List */
+      .dashboard-list {
+        list-style: none;
+        padding: 0;
+        margin: 2rem 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .dashboard-list li {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+      }
+
+      .dashboard-list strong {
+        color: var(--accent-color);
+        display: block;
+        margin-bottom: 0.5rem;
+        font-size: 1.05rem;
+      }
+
+      .dashboard-list li span {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+      }
+
+      /* Footer */
+      footer {
+        background-color: var(--bg-secondary);
+        border-top: 1px solid var(--border-color);
+        padding: 3rem 2rem;
+        text-align: center;
+      }
+
+      .footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .footer-text {
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+      }
+
+      .footer-link {
+        color: var(--accent-color);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s ease;
+      }
+
+      .footer-link:hover {
+        color: #2563eb;
+      }
+
+      /* Mobile Menu Toggle */
+      .menu-toggle {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text-primary);
+        padding: 0.5rem;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        header {
+          padding: 1.25rem 1.5rem;
+        }
+
+        nav {
+          flex-wrap: wrap;
+          gap: 1rem;
+        }
+
+        .menu-toggle {
+          display: block;
+        }
+
+        .nav-links {
+          flex-basis: 100%;
+          flex-direction: column;
+          gap: 1rem;
+          display: none;
+        }
+
+        .nav-links[data-open="true"] {
+          display: flex;
+        }
+
+        .hero {
+          padding: 2.5rem 1.5rem;
+        }
+
+        .hero h1 {
+          font-size: 1.75rem;
+        }
+
+        .hero-subtitle {
+          font-size: 1rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .hero-buttons {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .primary-btn,
+        .secondary-btn {
+          width: 100%;
+          max-width: 300px;
+        }
+
+        .status-container {
+          padding: 0 1.5rem 2rem;
+        }
+
+        .status-box {
+          padding: 1.5rem;
+        }
+
+        .status-grid {
+          gap: 1rem;
+        }
+
+        .status-item {
+          text-align: center;
+        }
+
+        .section {
+          padding: 2.5rem 1.5rem;
+        }
+
+        .section-title {
+          font-size: 1.5rem;
+          margin-bottom: 2rem;
+        }
+
+        .features-grid {
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+        }
+
+        footer {
+          padding: 2rem 1.5rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .logo {
+          font-size: 1.25rem;
+        }
+
+        .hero h1 {
+          font-size: 1.5rem;
+        }
+
+        .status-value {
+          font-size: 1.25rem;
+        }
+
+        .section-title {
+          font-size: 1.25rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Header -->
+    <header>
+      <nav>
+        <div class="logo">Kaunta</div>
+        <button class="menu-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Toggle navigation">
+          <span aria-hidden="true">☰</span>
+        </button>
+        <div id="primary-nav" class="nav-links" data-open="false">
+          <a href="#features">Features</a>
+          <a href="#installation">Installation</a>
+          <a href="#usage">Usage</a>
+          <a href="https://github.com/seuros/kaunta#readme">Documentation</a>
+        </div>
+        <a href="https://github.com/seuros/kaunta" class="cta-button">GitHub</a>
+      </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <main>
+      <section class="hero">
+        <h1>Analytics without bloat</h1>
+        <p class="hero-subtitle">
+          A simple, fast, privacy-focused web analytics engine. Drop-in
+          replacement for Umami.
+        </p>
+        <div class="hero-buttons">
+          <a href="https://github.com/seuros/kaunta#readme" class="primary-btn"
+            >Get Started</a
+          >
+          <a href="https://github.com/seuros/kaunta/releases" class="secondary-btn">Download</a>
+        </div>
+      </section>
+
+      <!-- Status Box -->
+      <section class="status-container">
+        <div class="status-box">
+          <dl class="status-grid">
+            <div class="status-item">
+              <dt class="status-label">Status</dt>
+              <dd class="status-value">Production Ready</dd>
+            </div>
+            <div class="status-item">
+              <dt class="status-label">Binary Size</dt>
+              <dd class="status-value">11 MB</dd>
+              <dd class="status-detail">Stripped binary</dd>
+            </div>
+            <div class="status-item">
+              <dt class="status-label">Deployment</dt>
+              <dd class="status-value">Single Binary</dd>
+              <dd class="status-detail">Ready to run</dd>
+            </div>
+            <div class="status-item">
+              <dt class="status-label">License</dt>
+              <dd class="status-value">MIT</dd>
+              <dd class="status-detail">Free & open source</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <!-- Features Section -->
+      <section class="section" id="features">
+        <h2 class="section-title">Features</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon" aria-hidden="true">🔒</div>
+            <h3 class="feature-title">Privacy-First</h3>
+            <p class="feature-description">
+              No cookies, no tracking, privacy by design
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" aria-hidden="true">⚡</div>
+            <h3 class="feature-title">Fast Deployment</h3>
+            <p class="feature-description">Single binary, ready to run</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" aria-hidden="true">📦</div>
+            <h3 class="feature-title">Lightweight</h3>
+            <p class="feature-description">Minimal memory footprint</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" aria-hidden="true">🔄</div>
+            <h3 class="feature-title">Umami Compatible</h3>
+            <p class="feature-description">Same API & database schema</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" aria-hidden="true">📊</div>
+            <h3 class="feature-title">Full Analytics</h3>
+            <p class="feature-description">
+              Visitors, pageviews, referrers, devices, locations, real-time
+              stats
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" aria-hidden="true">🌍</div>
+            <h3 class="feature-title">Geolocation</h3>
+            <p class="feature-description">
+              City/region level with automatic MaxMind GeoLite2 download
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Installation Section -->
+      <div class="section-alt">
+        <section class="section" id="installation">
+          <h2 class="section-title">Installation</h2>
+
+          <p
+            style="
+              text-align: center;
+              color: var(--text-secondary);
+              margin-bottom: 2rem;
+            "
+          >
+            Kaunta requires PostgreSQL 17+
+          </p>
+
+          <h3
+            style="
+              font-size: 1.25rem;
+              margin: 2rem 0 1rem;
+              font-weight: 600;
+              text-align: center;
+            "
+          >
+            Configuration
+          </h3>
+
+          <div class="code-block">
+            <div class="code-header">kaunta.toml (recommended)</div>
+            <div class="code-content">
+              <code><span class="code-function">database_url</span> = <span class="code-string">"postgresql://user:password@localhost:5432/kaunta"</span>
+<span class="code-function">port</span> = <span class="code-string">"3000"</span>
+<span class="code-function">data_dir</span> = <span class="code-string">"./data"</span></code>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">Or use environment variables</div>
+            <div class="code-content">
+              <code
+                ><span class="code-keyword">export</span>
+                <span class="code-function">DATABASE_URL</span>=<span
+                  class="code-string"
+                  >"postgresql://user:password@localhost:5432/kaunta"</span
+                ></code
+              >
+            </div>
+          </div>
+
+          <h3
+            style="
+              font-size: 1.25rem;
+              margin: 2rem 0 1rem;
+              font-weight: 600;
+              text-align: center;
+            "
+          >
+            Docker
+          </h3>
+          <div class="code-block">
+            <div class="code-header">docker</div>
+            <div class="code-content">
+              <code
+                ><span class="code-function">docker</span> run -e
+                <span class="code-function">DATABASE_URL</span>=<span
+                  class="code-string"
+                  >"postgresql://..."</span
+                >
+                -p 3000:3000 kaunta</code
+              >
+            </div>
+          </div>
+
+          <h3
+            style="
+              font-size: 1.25rem;
+              margin: 2rem 0 1rem;
+              font-weight: 600;
+              text-align: center;
+            "
+          >
+            Standalone Binary
+          </h3>
+          <div class="code-block">
+            <div class="code-header">bash</div>
+            <div class="code-content">
+              <code>./kaunta</code>
+            </div>
+          </div>
+
+          <div
+            style="
+              margin-top: 2rem;
+              background: white;
+              padding: 2rem;
+              border-radius: 10px;
+              border: 1px solid var(--border-color);
+            "
+          >
+            <h3
+              style="font-size: 1.1rem; margin-bottom: 1rem; font-weight: 600"
+            >
+              The server will:
+            </h3>
+            <ul class="feature-list">
+              <li>Auto-run database migrations on startup</li>
+              <li>Download GeoIP database if missing</li>
+              <li>Start on port 3000 (configurable with PORT env var)</li>
+            </ul>
+            <p style="margin-top: 1rem; color: var(--text-secondary)">
+              <strong>Health check endpoint:</strong>
+              <code
+                style="
+                  background: var(--bg-secondary);
+                  padding: 0.25rem 0.5rem;
+                  border-radius: 4px;
+                "
+                >GET /up</code
+              >
+            </p>
+          </div>
+        </section>
+      </div>
+
+      <!-- Usage Section -->
+      <section class="section" id="usage">
+        <h2 class="section-title">Usage</h2>
+
+        <p
+          style="
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+          "
+        >
+          Add this to your website (works like Google Analytics):
+        </p>
+
+        <div class="code-block">
+          <div class="code-header">html</div>
+          <div class="code-content">
+            <code
+              ><span class="code-keyword">&lt;script</span>
+              <span class="code-function">src</span>=<span class="code-string"
+                >"https://your-kaunta-server.com/k.js"</span
+              >
+              <span class="code-function">data-website-id</span>=<span
+                class="code-string"
+                >"your-website-uuid"</span
+              >
+              <span class="code-function">async defer</span
+              ><span class="code-keyword">&gt;&lt;/script&gt;</span></code
+            >
+          </div>
+        </div>
+
+        <p
+          style="
+            text-align: center;
+            color: var(--accent-color);
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-top: 2rem;
+          "
+        >
+          That's it! Analytics start collecting.
+        </p>
+      </section>
+
+      <!-- Dashboard Section -->
+      <div class="section-alt">
+        <section class="section" id="dashboard">
+          <h2 class="section-title">Dashboard</h2>
+
+          <p
+            style="
+              text-align: center;
+              color: var(--text-secondary);
+              margin-bottom: 2rem;
+            "
+          >
+            Visit
+            <code
+              style="
+                background: white;
+                padding: 0.25rem 0.5rem;
+                border-radius: 4px;
+                border: 1px solid var(--border-color);
+              "
+              >http://your-server:3000/dashboard</code
+            >
+            to see:
+          </p>
+
+          <ul class="dashboard-list">
+            <li>
+              <strong>Overview</strong>
+              <span
+                >Total visitors, pageviews, bounce rate, session duration</span
+              >
+            </li>
+            <li>
+              <strong>Pages</strong>
+              <span>Which pages get the most traffic</span>
+            </li>
+            <li>
+              <strong>Referrers</strong>
+              <span>Where your visitors come from</span>
+            </li>
+            <li>
+              <strong>Browsers/Devices</strong>
+              <span>What devices people use</span>
+            </li>
+            <li>
+              <strong>Locations</strong>
+              <span>Map showing visitor countries and cities</span>
+            </li>
+            <li>
+              <strong>Real-time</strong>
+              <span>Live visitor activity (updates every few seconds)</span>
+            </li>
+          </ul>
+        </section>
+      </div>
+
+      <!-- Umami Compatibility Section -->
+      <section class="section">
+        <h2 class="section-title">Umami Compatibility</h2>
+
+        <p
+          style="
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+          "
+        >
+          Drop-in replacement for Umami. Works with Umami's JavaScript tracker
+          and seamlessly migrates existing databases:
+        </p>
+
+        <ul class="feature-list" style="max-width: 600px; margin: 0 auto">
+          <li>Compatible tracking API</li>
+          <li>Umami's JS tracker just works</li>
+          <li>Auto-migrates existing Umami databases on startup</li>
+          <li>Enhanced with bot detection and advanced analytics</li>
+        </ul>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-content">
+        <p class="footer-text">
+          <strong>Kaunta (カウンタ)</strong> - Simple, fast analytics for
+          everyone
+        </p>
+        <p class="footer-text">
+          MIT License - Built for developers who value simplicity and
+          performance
+        </p>
+        <p>
+          <a href="https://github.com/seuros/kaunta" class="footer-link"
+            >GitHub Repository</a
+          >
+        </p>
+      </div>
+    </footer>
+
+    <!-- Mobile Menu Toggle Script -->
+    <script>
+      (function() {
+        const toggle = document.querySelector('.menu-toggle');
+        const nav = document.querySelector('#primary-nav');
+
+        if (toggle && nav) {
+          toggle.addEventListener('click', function() {
+            const isOpen = nav.getAttribute('data-open') === 'true';
+            nav.setAttribute('data-open', String(!isOpen));
+            toggle.setAttribute('aria-expanded', String(!isOpen));
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>
