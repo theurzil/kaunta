@@ -4,19 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kaunta - Analytics without bloat</title>
-    <meta name="description" content="Kaunta - Privacy-focused web analytics without bloat. Lightweight, fast, Umami-compatible analytics engine." />
+    <meta name="description" content="Kaunta - Privacy-focused web analytics without bloat. Lightweight, fast, self-hosted analytics engine." />
     <link rel="canonical" href="https://seuros.github.io/kaunta/" />
 
     <!-- Open Graph -->
     <meta property="og:title" content="Kaunta - Analytics without bloat" />
-    <meta property="og:description" content="Privacy-focused web analytics. Lightweight, fast, Umami-compatible." />
+    <meta property="og:description" content="Privacy-focused web analytics. Lightweight, fast, self-hosted." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://seuros.github.io/kaunta/" />
     <meta property="og:site_name" content="Kaunta Analytics" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Kaunta · Lightweight Umami-compatible analytics" />
+    <meta name="twitter:title" content="Kaunta · Lightweight self-hosted analytics" />
     <meta name="twitter:description" content="Self-hosted, privacy-first metrics in a single binary." />
 
     <!-- Theme Color -->
@@ -40,7 +40,7 @@
       "softwareVersion": "0.6.1",
       "url": "https://seuros.github.io/kaunta/",
       "downloadUrl": "https://github.com/seuros/kaunta/releases",
-      "description": "Privacy-focused web analytics without bloat. Lightweight, fast, Umami-compatible analytics engine."
+      "description": "Privacy-focused web analytics without bloat. Lightweight, fast, self-hosted analytics engine."
     }
     </script>
 
@@ -440,6 +440,130 @@
         font-size: 0.95rem;
       }
 
+      /* Pricing Section */
+      .pricing-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .pricing-card {
+        background: white;
+        padding: 2.5rem;
+        border-radius: 12px;
+        border: 2px solid var(--border-color);
+        position: relative;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .pricing-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      }
+
+      .pricing-card-enterprise {
+        border-color: var(--accent-color);
+      }
+
+      .enterprise-badge {
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--accent-color);
+        color: white;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+
+      .pricing-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+
+      .pricing-price {
+        text-align: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .price-amount {
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: block;
+        line-height: 1;
+      }
+
+      .price-period {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        display: block;
+        margin-top: 0.5rem;
+      }
+
+      .pricing-description {
+        text-align: center;
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+        font-size: 1rem;
+      }
+
+      .pricing-features {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 2rem 0;
+      }
+
+      .pricing-features li {
+        padding: 0.75rem 0;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+      }
+
+      .pricing-button {
+        display: block;
+        width: 100%;
+        padding: 0.875rem 2rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-align: center;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+      }
+
+      .pricing-button-primary {
+        background-color: var(--accent-color);
+        color: white;
+      }
+
+      .pricing-button-primary:hover {
+        background-color: #1d4ed8;
+      }
+
+      .pricing-button-secondary {
+        background-color: transparent;
+        color: var(--accent-color);
+        border: 2px solid var(--accent-color);
+        margin-top: 0.75rem;
+      }
+
+      .pricing-button-secondary:hover {
+        background-color: var(--bg-accent);
+      }
+
+      .enterprise-links {
+        margin-top: 1.5rem;
+      }
+
       /* Footer */
       footer {
         background-color: var(--bg-secondary);
@@ -608,7 +732,7 @@
         <div id="primary-nav" class="nav-links" data-open="false">
           <a href="#features">Features</a>
           <a href="#installation">Installation</a>
-          <a href="#usage">Usage</a>
+          <a href="#pricing">Pricing</a>
           <a href="https://github.com/seuros/kaunta#readme">Documentation</a>
         </div>
         <a href="https://github.com/seuros/kaunta" class="cta-button">GitHub</a>
@@ -620,8 +744,7 @@
       <section class="hero">
         <h1>Analytics without bloat</h1>
         <p class="hero-subtitle">
-          A simple, fast, privacy-focused web analytics engine. Drop-in
-          replacement for Umami.
+          A simple, fast, privacy-focused web analytics engine. Self-hosted and lightweight.
         </p>
         <div class="hero-buttons">
           <a href="https://github.com/seuros/kaunta#readme" class="primary-btn"
@@ -674,11 +797,6 @@
             <div class="feature-icon" aria-hidden="true">📦</div>
             <h3 class="feature-title">Lightweight</h3>
             <p class="feature-description">Minimal memory footprint</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon" aria-hidden="true">🔄</div>
-            <h3 class="feature-title">Umami Compatible</h3>
-            <p class="feature-description">Same API & database schema</p>
           </div>
           <div class="feature-card">
             <div class="feature-icon" aria-hidden="true">📊</div>
@@ -898,9 +1016,9 @@
         </section>
       </div>
 
-      <!-- Umami Compatibility Section -->
+      <!-- Why Kaunta Section -->
       <section class="section">
-        <h2 class="section-title">Umami Compatibility</h2>
+        <h2 class="section-title">Why Kaunta?</h2>
 
         <p
           style="
@@ -910,19 +1028,81 @@
             max-width: 800px;
             margin-left: auto;
             margin-right: auto;
+            font-size: 1.1rem;
+            line-height: 1.8;
           "
         >
-          Drop-in replacement for Umami. Works with Umami's JavaScript tracker
-          and seamlessly migrates existing databases:
+          Kaunta was built for a simple purpose: <strong>count visitors and understand basic usage patterns</strong>.
+          Know which browsers people use, what versions, which pages get traffic, and where visitors come from.
         </p>
 
-        <ul class="feature-list" style="max-width: 600px; margin: 0 auto">
-          <li>Compatible tracking API</li>
-          <li>Umami's JS tracker just works</li>
-          <li>Auto-migrates existing Umami databases on startup</li>
-          <li>Enhanced with bot detection and advanced analytics</li>
-        </ul>
+        <p
+          style="
+            text-align: center;
+            color: var(--text-secondary);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            font-size: 1.1rem;
+            line-height: 1.8;
+          "
+        >
+          It's <strong>not</strong> designed for conversion funnels, A/B testing, or tracking people across multiple websites.
+          Just clean, privacy-focused analytics that respect your visitors.
+        </p>
       </section>
+
+      <!-- Pricing Section -->
+      <div class="section-alt">
+        <section class="section" id="pricing">
+          <h2 class="section-title">Pricing</h2>
+
+          <div class="pricing-grid">
+            <div class="pricing-card">
+              <h3 class="pricing-title">Self-Hosted</h3>
+              <div class="pricing-price">
+                <span class="price-amount">$0</span>
+                <span class="price-period">forever</span>
+              </div>
+              <p class="pricing-description">Deploy Kaunta on your own infrastructure</p>
+              <ul class="pricing-features">
+                <li>✓ MIT License - unlimited instances</li>
+                <li>✓ No usage limits</li>
+                <li>✓ Your data, your control</li>
+                <li>✓ No tracking, no phone-home</li>
+                <li>✓ Commercial use allowed</li>
+                <li>✓ Community support via GitHub</li>
+              </ul>
+              <a href="https://github.com/seuros/kaunta#readme" class="pricing-button pricing-button-primary">Get Started</a>
+            </div>
+
+            <div class="pricing-card pricing-card-enterprise">
+              <div class="enterprise-badge">Need Support?</div>
+              <h3 class="pricing-title">Enterprise</h3>
+              <div class="pricing-price">
+                <span class="price-amount">Managed</span>
+              </div>
+              <p class="pricing-description">Need hosting, support, or enterprise features?</p>
+              <ul class="pricing-features">
+                <li>✓ Fully managed hosting</li>
+                <li>✓ Professional support</li>
+                <li>✓ SLA guarantees</li>
+                <li>✓ Advanced features</li>
+                <li>✓ Team collaboration</li>
+                <li>✓ Priority updates</li>
+              </ul>
+              <div class="enterprise-links">
+                <p style="margin-bottom: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                  Consider these excellent managed analytics services:
+                </p>
+                <a href="https://umami.is" target="_blank" rel="noopener" class="pricing-button pricing-button-secondary">Umami Cloud</a>
+                <a href="https://plausible.io" target="_blank" rel="noopener" class="pricing-button pricing-button-secondary">Plausible Analytics</a>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
     </main>
 
     <!-- Footer -->
