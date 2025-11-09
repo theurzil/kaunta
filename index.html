@@ -616,6 +616,89 @@
         border-width: 0;
       }
 
+      /* Announcement Bar */
+      .announcement-bar {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 0.875rem 2rem;
+        text-align: center;
+        position: sticky;
+        top: 0;
+        z-index: 101;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        animation: slideDown 0.4s ease-out;
+      }
+
+      .announcement-bar[data-hidden="true"] {
+        display: none;
+      }
+
+      @keyframes slideDown {
+        from {
+          transform: translateY(-100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .announcement-content {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .announcement-text {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      .announcement-link {
+        color: white;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        font-weight: 700;
+        transition: opacity 0.2s ease;
+      }
+
+      .announcement-link:hover {
+        opacity: 0.8;
+      }
+
+      .announcement-close {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        line-height: 1;
+        transition: background 0.2s ease;
+        margin-left: 1rem;
+      }
+
+      .announcement-close:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .announcement-close:focus-visible {
+        outline: 2px solid white;
+        outline-offset: 2px;
+      }
+
       /* Responsive Design */
       @media (max-width: 768px) {
         header {
@@ -722,6 +805,19 @@
   </head>
 
   <body>
+    <!-- Announcement Bar -->
+    <div class="announcement-bar" id="announcement-bar" role="banner" data-hidden="false">
+      <div class="announcement-content">
+        <span class="announcement-text">
+          🎉 We just raised <strong>$100 Trillion</strong> from Satoshi Nakamoto!
+          <a href="https://en.wikipedia.org/wiki/Zimbabwean_one_hundred_trillion_dollar_note" target="_blank" rel="noopener" class="announcement-link">Learn more</a>
+        </span>
+      </div>
+      <button class="announcement-close" onclick="dismissAnnouncement()" aria-label="Close announcement">
+        ×
+      </button>
+    </div>
+
     <!-- Header -->
     <header>
       <nav>
@@ -1138,6 +1234,25 @@
           });
         }
       })();
+
+      // Announcement Bar
+      (function() {
+        const announcementBar = document.getElementById('announcement-bar');
+        const STORAGE_KEY = 'kaunta-announcement-dismissed';
+
+        // Check if user previously dismissed the announcement
+        if (localStorage.getItem(STORAGE_KEY) === 'true') {
+          announcementBar.setAttribute('data-hidden', 'true');
+        }
+      })();
+
+      function dismissAnnouncement() {
+        const announcementBar = document.getElementById('announcement-bar');
+        const STORAGE_KEY = 'kaunta-announcement-dismissed';
+
+        announcementBar.setAttribute('data-hidden', 'true');
+        localStorage.setItem(STORAGE_KEY, 'true');
+      }
     </script>
   </body>
 </html>
